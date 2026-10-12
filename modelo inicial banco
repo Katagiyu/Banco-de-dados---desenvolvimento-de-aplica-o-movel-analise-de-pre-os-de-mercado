@@ -1,0 +1,103 @@
+CREATE TABLE IF NOT EXISTS "lista_interesse" (
+	"usuario_id" UUID NOT NULL,
+	"produto_id" UUID NOT NULL,
+	PRIMARY KEY("usuario_id", "produto_id")
+);
+
+CREATE TABLE IF NOT EXISTS "oferta" (
+	"id" UUID NOT NULL,
+	"produto_id" UUID NOT NULL,
+	"supermercado_id" UUID NOT NULL,
+	"panfleto_id" UUID,
+	"valor_original" NUMERIC,
+	"valor_varejo" NUMERIC NOT NULL,
+	"valor_atacado" NUMERIC,
+	"data_inicio" DATE NOT NULL,
+	"data_fim" DATE NOT NULL,
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "produto" (
+	"id" UUID NOT NULL,
+	"descricao" VARCHAR(255) NOT NULL,
+	"categoria" VARCHAR(100) NOT NULL,
+	"marca" VARCHAR(100),
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "panfleto" (
+	"id" UUID NOT NULL,
+	"supermercado_id" UUID NOT NULL,
+	"url_publicacao" VARCHAR(500),
+	"url_imagem" VARCHAR(500) NOT NULL,
+	"data_publicacao" DATE,
+	"data_coleta" TIMESTAMP NOT NULL,
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "endereco_supermercado" (
+	"id" UUID NOT NULL,
+	"supermercado_id" UUID NOT NULL,
+	"rua" VARCHAR(150) NOT NULL,
+	"numero" INTEGER,
+	"bairro" VARCHAR(100) NOT NULL,
+	"cidade" VARCHAR(100) NOT NULL,
+	"estado" VARCHAR(2) NOT NULL,
+	"cep" VARCHAR(8),
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "supermercado" (
+	"id" UUID NOT NULL,
+	"nome" VARCHAR(150) NOT NULL,
+	"cnpj" VARCHAR(14) UNIQUE,
+	"instagram" VARCHAR(100) NOT NULL UNIQUE,
+	"ativo" BOOLEAN NOT NULL,
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "endereco_usuario" (
+	"id" UUID NOT NULL,
+	"usuario_id" UUID NOT NULL,
+	"rua" VARCHAR(150) NOT NULL,
+	"numero" INTEGER,
+	"bairro" VARCHAR(100) NOT NULL,
+	"cidade" VARCHAR(100) NOT NULL,
+	"estado" VARCHAR(2) NOT NULL,
+	"cep" VARCHAR(8),
+	PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "usuario" (
+	"id" UUID NOT NULL,
+	"auth_id" VARCHAR(255) NOT NULL UNIQUE,
+	"nome" VARCHAR(150) NOT NULL,
+	"email" VARCHAR(255) NOT NULL UNIQUE,
+	PRIMARY KEY("id"),
+  "senha" VARCHAR (20) NOTNULL
+);
+
+ALTER TABLE "endereco_usuario"
+ADD FOREIGN KEY("usuario_id") REFERENCES "usuario"("id")
+ON UPDATE NO ACTION ON DELETE CASCADE;
+ALTER TABLE "endereco_supermercado"
+ADD FOREIGN KEY("supermercado_id") REFERENCES "supermercado"("id")
+ON UPDATE NO ACTION ON DELETE CASCADE;
+ALTER TABLE "panfleto"
+ADD FOREIGN KEY("supermercado_id") REFERENCES "supermercado"("id")
+ON UPDATE NO ACTION ON DELETE CASCADE;
+ALTER TABLE "oferta"
+ADD FOREIGN KEY("produto_id") REFERENCES "produto"("id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "oferta"
+ADD FOREIGN KEY("supermercado_id") REFERENCES "supermercado"("id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "oferta"
+ADD FOREIGN KEY("panfleto_id") REFERENCES "panfleto"("id")
+ON UPDATE NO ACTION ON DELETE SET NULL;
+ALTER TABLE "lista_interesse"
+ADD FOREIGN KEY("usuario_id") REFERENCES "usuario"("id")
+ON UPDATE NO ACTION ON DELETE CASCADE;
+ALTER TABLE "lista_interesse"
+ADD FOREIGN KEY("produto_id") REFERENCES "produto"("id")
+ON UPDATE NO ACTION ON DELETE CASCADE;
